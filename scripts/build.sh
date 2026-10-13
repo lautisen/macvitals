@@ -53,7 +53,9 @@ codesign --verify --strict "$APP"
 echo "==> Building package"
 # Explicit component plist: never let Installer "relocate" the app to another copy on disk.
 pkgbuild --analyze --root "$STAGE/payload" "$STAGE/components.plist" >/dev/null
-/usr/libexec/PlistBuddy -c "Add :0:BundleIsRelocatable bool false" "$STAGE/components.plist"
+# Older pkgbuild versions omit the key, newer ones include it.
+/usr/libexec/PlistBuddy -c "Set :0:BundleIsRelocatable false" "$STAGE/components.plist" 2>/dev/null \
+    || /usr/libexec/PlistBuddy -c "Add :0:BundleIsRelocatable bool false" "$STAGE/components.plist"
 SIGN_ARGS=()
 [[ -n "${DEVELOPER_ID_INSTALLER:-}" ]] && SIGN_ARGS=(--sign "$DEVELOPER_ID_INSTALLER" --timestamp)
 pkgbuild \
