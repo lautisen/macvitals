@@ -1,0 +1,12 @@
+.DS_Store
+.build/
+build/
+.swiftpm/
+*.xcodeproj
+DerivedData/
+
+# Never commit real configuration: it may contain a webhook URL with a token or a signing secret.
+config.json
+*.mobileconfig
+!examples/MacVitals.mobileconfig
+received/

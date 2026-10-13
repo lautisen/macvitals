@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Example configuration profile for MDM (Jamf, Intune, Kandji, Mosyle...).
+  Keys here override /Library/Application Support/MacVitals/config.json.
+  Replace the UUIDs (uuidgen), the URL and the secret before deploying.
+  Most MDMs also let you paste just the inner dictionary as "Application & Custom Settings"
+  for the domain io.github.macvitals.
+-->
+<plist version="1.0">
+<dict>
+    <key>PayloadContent</key>
+    <array>
+        <dict>
+            <key>PayloadType</key>
+            <string>io.github.macvitals</string>
+            <key>PayloadIdentifier</key>
+            <string>io.github.macvitals.settings</string>
+            <key>PayloadUUID</key>
+            <string>00000000-0000-0000-0000-000000000001</string>
+            <key>PayloadVersion</key>
+            <integer>1</integer>
+
+            <key>organizationName</key>
+            <string>Example Corp IT</string>
+            <key>supportContact</key>
+            <string>the Service Desk (helpdesk@example.com)</string>
+            <key>monitoringDays</key>
+            <integer>7</integer>
+            <key>autoUninstall</key>
+            <true/>
+            <key>webhook</key>
+            <dict>
+                <key>url</key>
+                <string>https://your-endpoint.example.com/macvitals</string>
+                <key>secret</key>
+                <string>REPLACE-WITH-A-RANDOM-SECRET</string>
+            </dict>
+        </dict>
+    </array>
+    <key>PayloadDisplayName</key>
+    <string>MacVitals settings</string>
+    <key>PayloadIdentifier</key>
+    <string>io.github.macvitals.profile</string>
+    <key>PayloadScope</key>
+    <string>System</string>
+    <key>PayloadType</key>
+    <string>Configuration</string>
+    <key>PayloadUUID</key>
+    <string>00000000-0000-0000-0000-000000000000</string>
+    <key>PayloadVersion</key>
+    <integer>1</integer>
+</dict>
+</plist>

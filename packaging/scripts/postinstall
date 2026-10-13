@@ -1,0 +1,26 @@
+#!/bin/sh
+# Starts the root daemon and, if someone is logged in, the menu bar notice.
+[ "$3" = "/" ] || exit 0
+
+DAEMON_LABEL="io.github.macvitals.daemon"
+AGENT_LABEL="io.github.macvitals.agent"
+SUPPORT="/Library/Application Support/MacVitals"
+
+/usr/sbin/chown root:wheel "/Library/LaunchDaemons/$DAEMON_LABEL.plist" "/Library/LaunchAgents/$AGENT_LABEL.plist"
+/bin/chmod 644 "/Library/LaunchDaemons/$DAEMON_LABEL.plist" "/Library/LaunchAgents/$AGENT_LABEL.plist"
+
+# The package never contains secrets, but an admin may have dropped a config.json in place.
+[ -f "$SUPPORT/config.json" ] && /usr/sbin/chown root:wheel "$SUPPORT/config.json" && /bin/chmod 600 "$SUPPORT/config.json"
+
+/bin/mkdir -p /usr/local/bin
+/bin/ln -sf "$SUPPORT/MacVitals.app/Contents/MacOS/macvitals" /usr/local/bin/macvitals
+
+/bin/launchctl bootstrap system "/Library/LaunchDaemons/$DAEMON_LABEL.plist"
+
+CONSOLE_UID=$(/usr/bin/stat -f %u /dev/console)
+if [ "$CONSOLE_UID" -ne 0 ]; then
+    # Give the daemon a moment to write status.json, which the agent reads.
+    /bin/sleep 3
+    /bin/launchctl bootstrap "gui/$CONSOLE_UID" "/Library/LaunchAgents/$AGENT_LABEL.plist"
+fi
+exit 0

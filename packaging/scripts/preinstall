@@ -1,0 +1,18 @@
+#!/bin/sh
+# Stops a previous installation before the new files are copied.
+[ "$3" = "/" ] || exit 0
+
+DAEMON_LABEL="io.github.macvitals.daemon"
+AGENT_LABEL="io.github.macvitals.agent"
+SUPPORT="/Library/Application Support/MacVitals"
+
+/bin/launchctl bootout "system/$DAEMON_LABEL" 2>/dev/null
+for uid in $(/bin/ps -axo uid=,comm= | /usr/bin/awk '/loginwindow$/ {print $1}' | /usr/bin/sort -u); do
+    /bin/launchctl bootout "gui/$uid/$AGENT_LABEL" 2>/dev/null
+done
+
+# Reinstalling after a finished session starts a fresh one. config.json and reports are kept.
+if [ -f "$SUPPORT/data/state.json" ] && /usr/bin/grep -q '"finished":true' "$SUPPORT/data/state.json"; then
+    /bin/rm -rf "$SUPPORT/data" "$SUPPORT/status.json" "$SUPPORT/latest.html"
+fi
+exit 0

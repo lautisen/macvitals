@@ -1,0 +1,30 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check tag matches version
+        run: |
+          VERSION=$(sed -n 's/.*static let version = "\(.*\)".*/\1/p' Sources/MacVitalsCore/Constants.swift)
+          [ "v$VERSION" = "$GITHUB_REF_NAME" ] || { echo "Tag $GITHUB_REF_NAME does not match version $VERSION"; exit 1; }
+      - run: swift test
+      # Unsigned build. To ship a signed + notarized package, import your Developer ID
+      # certificates into a temporary keychain here and set DEVELOPER_ID_APP,
+      # DEVELOPER_ID_INSTALLER and NOTARY_PROFILE (see scripts/build.sh).
+      - run: scripts/build.sh
+      - run: swift run macvitals demo-report -o build/demo-report.html
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" build/*.pkg build/*.sha256 build/demo-report.html \
+            --title "MacVitals $GITHUB_REF_NAME" --generate-notes

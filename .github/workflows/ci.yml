@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Toolchain
+        run: swift --version
+      - name: Test
+        run: swift test
+      - name: Build universal installer package
+        run: scripts/build.sh
+      - name: Render demo report
+        run: swift run macvitals demo-report -o build/demo-report.html
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MacVitals-unsigned
+          path: |
+            build/*.pkg
+            build/*.sha256
+            build/demo-report.html
+
+  lint-scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: ShellCheck
+        run: shellcheck scripts/build.sh packaging/scripts/preinstall packaging/scripts/postinstall
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

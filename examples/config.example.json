@@ -1,0 +1,16 @@
+{
+  "organizationName": "Example Corp IT",
+  "supportContact": "the Service Desk (helpdesk@example.com)",
+  "monitoringDays": 7,
+  "autoUninstall": true,
+  "sampleIntervalSeconds": 300,
+  "reportIntervalSeconds": 3600,
+  "showNotice": true,
+  "collectProcessNames": true,
+  "topProcessCount": 10,
+  "webhook": {
+    "url": "https://your-endpoint.example.com/macvitals",
+    "secret": "generate-with: openssl rand -base64 32",
+    "headers": {}
+  }
+}
